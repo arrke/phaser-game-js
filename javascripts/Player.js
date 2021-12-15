@@ -8,6 +8,17 @@ export class Player extends Phaser.Physics.Matter.Sprite{
     } = data
     super(scene.matter.world, x,y, texture,frame)
     this.scene.add.existing(this);
+
+    const{Body, Bodies} = Phaser.Physics.Matter.Matter;
+
+    let playerCollider = Bodies.circle(this.x,this.y,12,{isSensor:false, label:"playerCollider"})
+    let playerSensor = Bodies.circle(this.x, this.y, 24, {isSensor:true, label:"playerSensor"})
+    const compoundBody = Body.create({
+      parts:[playerCollider, playerSensor],
+      frictionAir:0.35,
+    })
+    this.setExistingBody(compoundBody)
+    this.setFixedRotation();
   }
 
   //Podczas tworzenia sceny załaduj odpowiednie assety jako sprite dla danej postaci
