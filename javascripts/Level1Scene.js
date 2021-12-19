@@ -1,8 +1,8 @@
 import { Player } from "./Player.js";
 
-export class LevelScene extends Phaser.Scene{
+export class Level1Scene extends Phaser.Scene{
   constructor(){
-    super("level")
+    super("level1")
   }
   init(data){
     let{
@@ -22,11 +22,24 @@ export class LevelScene extends Phaser.Scene{
 
   preload(){
     this.load.tilemapTiledJSON('map_level',`./assets/maps/map${this.player.level}.json`);
+    this.load.image('spike','./assets/Free/Traps/Spikes/Idle.png');
     this.load.image('tiles','./assets/maps/terrain.png');
     this.load.image('restart', './assets/Free/Menu/Buttons/Restart.png')
+    this.load.image('endlvl', 'assets/Free/Items/Checkpoints/Start/Start (Idle).png')
+
     Player.preload(this)
   }
+  sendToNextLevel(){
+    if(this.player.body.touching.down && this.check.body.touching.up){
+      this.player.next(true, this.scene)
+      this.player.body.x = 1000
+    }
+  }
 
+  playerHit(){
+    this.player.next(false)
+    this.cameras.main.startFollow(this.player.disappearing);
+  }
   create(){
     const map = this.make.tilemap({key: 'map_level', tileWidth: 16, tileHeight: 16})
     const tileset = map.addTilesetImage('Terrain (16x16)', 'tiles')
@@ -48,6 +61,30 @@ export class LevelScene extends Phaser.Scene{
 
     this.physics.add.collider(this.player, this.background);
     this.physics.add.collider(this.player, this.map);
+
+    this.spikes = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    });
+  
+    map.getObjectLayer('spikes').objects.forEach((spike) => {
+      // Add new spikes to our sprite group
+      const spikeSprite = this.spikes.create(spike.x, spike.y- spike.height, 'spike').setOrigin(0);
+      spikeSprite.body.setSize(spike.width-2, spike.height - 10).setOffset(0, 10);
+    });
+    this.physics.add.collider(this.player, this.spikes, this.playerHit, null, this);
+
+    this.checkpoint = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    });
+    map.getObjectLayer('end').objects.forEach((checkpoint) => {
+      // Add new checkpoints to our sprite group
+      this.check = this.checkpoint.create(checkpoint.x, checkpoint.y- checkpoint.height, 'endlvl').setOrigin(0);
+      this.check.body.setSize(checkpoint.width- 23, checkpoint.height - 55).setOffset(23, 55);
+    });
+    this.physics.add.collider(this.player, this.check, this.sendToNextLevel, null, this);
+
     this.cursors = this.input.keyboard.createCursorKeys();
     this.cameras.main.setBounds(0, 0);
     this.cameras.main.startFollow(this.player);

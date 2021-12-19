@@ -1,5 +1,6 @@
 import { MainScene } from './MainScene.js';
-import { LevelScene } from './LevelScene.js';
+import { Level1Scene } from './Level1Scene.js';
+import { Level2Scene } from './LevelWithEnemies.js';
 
 var config = {
   type: Phaser.AUTO,
@@ -12,7 +13,11 @@ var config = {
           debug: true
       }
   },
-  scene: [MainScene, LevelScene]
+  scene: [
+    MainScene, 
+    Level1Scene,
+    Level2Scene
+  ]
 };
 
 new Phaser.Game(config);

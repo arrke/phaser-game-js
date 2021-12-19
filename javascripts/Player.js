@@ -57,13 +57,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite{
       this.setVelocityY(0);
       this.setVelocityX(0);
     }
+    if (cursors.shift.isDown){
+      this.scene.pause
+    }
   }
+
   addPoints(value){
     this.points = this.points + value
   }
   next(hitted,scene){
     this.visible = false
     this.disappearing = this.scene.add.sprite(this.body.x, this.body.y, 'player_disapear');
+    this.disappearing.setDepth(99)
     this.disappearing.anotherScene = scene
     this.disappearing.player = this
     this.disappearing.play("desappearingPlayer")  
@@ -73,8 +78,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite{
 
     this.disappearing.on('animationcomplete', function(){
       if(this.anotherScene){
-        this.anotherScene.start("level", {
-          level: this.player.level + 1,
+        this.anotherScene.start(
+          'level2'
+          // `level${this.player.level + 1}`
+          , {
+          level: this.player.level + 2,
           points: this.player.points
         })
       }
