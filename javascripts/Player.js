@@ -73,7 +73,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite{
 
     this.disappearing.on('animationcomplete', function(){
       if(this.anotherScene){
-        this.anotherScene.start("level", this.player.level + 1)
+        this.anotherScene.start("level", {
+          level: this.player.level + 1,
+          points: this.player.points
+        })
       }
     });
 

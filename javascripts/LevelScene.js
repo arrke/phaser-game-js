@@ -5,13 +5,19 @@ export class LevelScene extends Phaser.Scene{
     super("level")
   }
   init(data){
+    let{
+      points,
+      level
+    } = data
     Player.preload(this)
     this.player = new Player({
       scene:this,
       x:100,
       y:100,
-      level: data
+      level: level,
+      points: points
     })
+    this.latestPoints = points;
   }
 
   preload(){
@@ -32,12 +38,14 @@ export class LevelScene extends Phaser.Scene{
     const restartButton = this.add.image(460,40,'restart').setInteractive().setScrollFactor(0);
     restartButton.setScale(1.5)
     restartButton.setDepth(99)
-    restartButton.fixedToCamera = true;
   
     restartButton.on('pointerup', () => {
-      this.scene.start(this, this.player.level)
+      this.scene.start(this, {
+        level: this.player.level,
+        points: this.latestPoints
+      })
     })
-    
+
     this.physics.add.collider(this.player, this.background);
     this.physics.add.collider(this.player, this.map);
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -73,9 +81,12 @@ export class LevelScene extends Phaser.Scene{
       frameRate: 17,
     });
 
+    this.point_text = this.add.text(20, 0, `Points : ${this.player.points}`).setScrollFactor(0);
+    this.point_text.setDepth(99)
   }
 
   update(){
     this.player.update(this.cursors)
+    this.point_text.setText(`Points : ${this.player.points}`)
   }
 }

@@ -13,7 +13,8 @@ export class MainScene extends Phaser.Scene{
     this.load.image('endlvl', 'assets/Free/Items/Checkpoints/Start/Start (Idle).png')
     this.load.spritesheet('spriteFruitKey', 'assets/Free/Items/Fruits/Pineapple.png',{ frameWidth: 32, frameHeight: 32 }, 17)
     this.load.spritesheet('spriteFruit', 'assets/Free/Items/Fruits/Apple.png',{ frameWidth: 32, frameHeight: 32 }, 17)
-    
+    this.load.spritesheet('colletedSpriteFruit', 'assets/Free/Items/Fruits/Collected.png',{ frameWidth: 32, frameHeight: 32 }, 17)
+
     this.load.tilemapTiledJSON('map','./assets/maps/map0.json');
     this.load.image('restart', './assets/Free/Menu/Buttons/Restart.png')
     Player.preload(this)
@@ -44,7 +45,12 @@ export class MainScene extends Phaser.Scene{
   getPoints(sprite, fruit){
     this.fruits.killAndHide(fruit);
     fruit.body.enable = false;
+    var nowCollectedFruit= this.add.sprite(fruit.body.x + fruit.body.width/2, fruit.body.y + fruit.body.height/2, 'colletedSpriteFruit');
     this.player.addPoints(10)
+    nowCollectedFruit.play("collectedFruitAnim")
+    nowCollectedFruit.on('animationcomplete', function(){
+      this.visible = false
+    });
   }
 
 create ()
@@ -72,6 +78,13 @@ create ()
     frameRate: 17,
     repeat: -1
   });
+
+  this.anims.create({
+    key: 'collectedFruitAnim',
+    frames: this.anims.generateFrameNumbers('colletedSpriteFruit', { start: 0, end: 5 }),
+    frameRate: 20,
+  });
+
   this.anims.create({
     key: 'desappearingPlayer',
     frames: this.anims.generateFrameNumbers('player_disapear', { start: 0, end: 8 }),
