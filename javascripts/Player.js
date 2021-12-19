@@ -1,17 +1,27 @@
 
 export class Player extends Phaser.Physics.Arcade.Sprite{
-  constructor(scene){
-    super(scene, 100, 200, 'player_sprite')
+  constructor(data){
+    let{
+      scene,
+      x,
+      y,
+      level,
+      points
+    } = data
+    super(scene, x, y, 'player_sprite')
     scene.physics.add.existing(this);
     this.scene.add.existing(this, true) 
     this.body.setSize(this.body.width-10,this.body.height-2)
+    this.setDepth(99);
+    this.level = level
+    this.points = points
   }
 
   static preload(scene){
     scene.load.spritesheet('player_sprite', './assets/player.png', { frameWidth: 32, frameHeight: 32 })
     scene.load.spritesheet('player_disapear', './assets/Free/Main Characters/Desappearing (96x96).png', { frameWidth: 96, frameHeight: 96 })
   }
-
+  
   create(){
     this.setVelocity(100, 200);
     this.setBounce(0.2);
@@ -47,17 +57,41 @@ export class Player extends Phaser.Physics.Arcade.Sprite{
       this.setVelocityY(0);
       this.setVelocityX(0);
     }
+    if (cursors.shift.isDown){
+      this.scene.pause
+    }
   }
 
-  next(){
+  addPoints(value){
+    this.points = this.points + value
+  }
+  next(hitted,scene){
     this.visible = false
     this.disappearing = this.scene.add.sprite(this.body.x, this.body.y, 'player_disapear');
+    this.disappearing.setDepth(99)
+    this.disappearing.anotherScene = scene
+    this.disappearing.player = this
     this.disappearing.play("desappearingPlayer")  
     this.disappearing.on('animationcomplete', function(){
-      console.log(this.visible = false)
+      this.visible = false
     });
-    this.x = 100
-    this.y = 200
+
+    this.disappearing.on('animationcomplete', function(){
+      if(this.anotherScene){
+        this.anotherScene.start(
+          'level2'
+          // `level${this.player.level + 1}`
+          , {
+          level: this.player.level + 2,
+          points: this.player.points
+        })
+      }
+    });
+
+    if(!hitted){
+      this.x = -500
+      this.y = -1 
+    }
   }
 
 }

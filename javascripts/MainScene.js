@@ -8,21 +8,26 @@ export class MainScene extends Phaser.Scene{
   
   preload ()
   {
-    this.load.image('sky', 'assets/sky.png');
     this.load.image('tiles','./assets/maps/terrain.png');
     this.load.image('spike','./assets/Free/Traps/Spikes/Idle.png');
     this.load.image('endlvl', 'assets/Free/Items/Checkpoints/Start/Start (Idle).png')
-    this.load.spritesheet('spriteFruit', 'assets/Free/Items/Fruits/Pineapple.png',{ frameWidth: 32, frameHeight: 32 }, 17)
-    this.load.tilemapTiledJSON('map','./assets/maps/map1.json');
+    this.load.spritesheet('spriteFruitKey', 'assets/Free/Items/Fruits/Pineapple.png',{ frameWidth: 32, frameHeight: 32 }, 17)
+    this.load.spritesheet('spriteFruit', 'assets/Free/Items/Fruits/Apple.png',{ frameWidth: 32, frameHeight: 32 }, 17)
+    this.load.spritesheet('colletedSpriteFruit', 'assets/Free/Items/Fruits/Collected.png',{ frameWidth: 32, frameHeight: 32 }, 17)
+
+    this.load.tilemapTiledJSON('map','./assets/maps/map0.json');
+    this.load.image('restart', './assets/Free/Menu/Buttons/Restart.png')
     Player.preload(this)
   }
   playerHit(){
-    this.player.next(this)
+    this.player.next(false)
   }
+  
 
   sendToNextLevel(){
     if(this.player.body.touching.down && this.check.body.touching.up){
-      this.player.next(this)
+      this.player.next(true, this.scene)
+      this.player.body.x = 1000
     }
   }
 
@@ -37,11 +42,28 @@ export class MainScene extends Phaser.Scene{
     }
   }
 
+  getPoints(sprite, fruit){
+    this.fruits.killAndHide(fruit);
+    fruit.body.enable = false;
+    var nowCollectedFruit= this.add.sprite(fruit.body.x + fruit.body.width/2, fruit.body.y + fruit.body.height/2, 'colletedSpriteFruit');
+    this.player.addPoints(10)
+    nowCollectedFruit.play("collectedFruitAnim")
+    nowCollectedFruit.on('animationcomplete', function(){
+      this.visible = false
+    });
+  }
+
 create ()
 {
     const map = this.make.tilemap({key: 'map', tileWidth: 16, tileHeight: 16})
     const tileset = map.addTilesetImage('terrain', 'tiles')
-    // const tileset = map.addTilesetImage("BaseChip_pipo", 'tiles',32,32,0,0);
+
+    const restartButton = this.add.image(460,40,'restart').setInteractive()
+    restartButton.setScale(1.5)
+    restartButton.setDepth(99)
+    restartButton.on('pointerup', () => {
+      this.scene.start(this)
+    })
     this.notDestroyed = true;
     this.border = map.createLayer('border', tileset)
     this.terrain = map.createLayer('terrain', tileset)
@@ -56,6 +78,13 @@ create ()
     frameRate: 17,
     repeat: -1
   });
+
+  this.anims.create({
+    key: 'collectedFruitAnim',
+    frames: this.anims.generateFrameNumbers('colletedSpriteFruit', { start: 0, end: 5 }),
+    frameRate: 20,
+  });
+
   this.anims.create({
     key: 'desappearingPlayer',
     frames: this.anims.generateFrameNumbers('player_disapear', { start: 0, end: 8 }),
@@ -78,7 +107,13 @@ create ()
     frameRate: 17,
   });
 
-  this.player = new Player(this);
+  this.player = new Player({
+    scene:this,
+    x:100,
+    y:200,
+    level: 0,
+    points: 0
+  });
 
   this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -86,7 +121,7 @@ create ()
   this.physics.add.collider(this.player, this.border);
   this.wallCollider = this.physics.add.collider(this.player, this.walls);
 
-
+  //Dodanie kolców
   this.spikes = this.physics.add.group({
     allowGravity: false,
     immovable: true
@@ -99,6 +134,7 @@ create ()
   });
   this.physics.add.collider(this.player, this.spikes, this.playerHit, null, this);
 
+  //Dodanie przejścia na kolejną mapkę
   this.checkpoint = this.physics.add.group({
     allowGravity: false,
     immovable: true
@@ -117,13 +153,12 @@ create ()
   });
 
   map.getObjectLayer('keys').objects.forEach((keyObj) => {
-    // Add new keys to our sprite group
    
-    this.unlockKey = this.add.sprite(keyObj.x, keyObj.y- keyObj.height, 'spriteFruit').setOrigin(0);
+    this.unlockKey = this.add.sprite(keyObj.x, keyObj.y- keyObj.height, 'spriteFruitKey').setOrigin(0);
 
     this.anims.create({
       key: 'idle',
-      frames: this.anims.generateFrameNumbers('spriteFruit', { start: 0, end: 16 }),
+      frames: this.anims.generateFrameNumbers('spriteFruitKey', { start: 0, end: 16 }),
       frameRate: 17,
       repeat: -1
     });
@@ -132,15 +167,43 @@ create ()
     
   });
 
+  this.fruits = this.physics.add.group({
+    allowGravity: false,
+    immovable: true,
+    key: 'fruits'
+  });
+
+  map.getObjectLayer('fruitPoints').objects.forEach((fruit) => {
+   
+    var fruit = this.add.sprite(fruit.x, fruit.y- fruit.height, 'spriteFruit').setOrigin(0).setScale(0.8);
+    fruit.setSize(fruit.width, fruit.height, true);
+    this.anims.create({
+      key: 'idle_point',
+      frames: this.anims.generateFrameNumbers('spriteFruit', { start: 0, end: 16 }),
+      frameRate: 30,
+      repeat: -1
+    });
+
+    fruit.anims.play('idle_point', true)
+    this.fruits.add(fruit)
+    
+  });
+
+
   this.physics.add.collider(this.player, this.spikes, this.playerHit, null, this);
   this.physics.add.collider(this.player, this.check, this.sendToNextLevel, null, this);
+  this.physics.add.overlap(this.player, this.fruits, this.getPoints, null, this);
+  
   this.keyCollider = this.physics.add.collider(this.player, this.key, this.getKey, null, this);
-
+  
+  this.point_text = this.add.text(20, 0, `Points : ${this.player.points}`)
+  this.point_text.setDepth(99)
 }
 
   update ()
   {
     this.player.update(this.cursors)
+    this.point_text.setText(`Points : ${this.player.points}`)
   }
 
   
