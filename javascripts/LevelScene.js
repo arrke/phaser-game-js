@@ -84,7 +84,7 @@ export class LevelScene extends Phaser.Scene{
       immovable: true
     });
     this.birds = this.physics.add.group({
-      allowGravity: true,
+      allowGravity: false,
       key: 'birds',
       collidWorldBounds:true
     });
@@ -98,7 +98,7 @@ export class LevelScene extends Phaser.Scene{
     this.physics.add.collider(this.player, this.spikes, this.playerHit, null, this);
 
     map.getObjectLayer('bird').objects.forEach((bird)=>{
-      var bird=this.add.sprite(bird.x,bird.y,'spriteBird').setOrigin(0)
+      var bird=this.add.sprite(bird.x,bird.y-bird.height,'spriteBird').setOrigin(0)
       this.anims.create({
         key: 'idle_bird',
         frames: this.anims.generateFrameNumbers('spriteBird',{start:0, end:7}),
@@ -122,13 +122,12 @@ export class LevelScene extends Phaser.Scene{
     {
       if(bird.x-20<=this.player.x && bird.x+20>=this.player.x && this.player.y>bird.y)
       {
-        //bird.setVelocityY(100);
-        console.log("attack");
-        //if(bird.body.blocked.down)
-       // {
-
-        //}
+        bird.body.setVelocityY(200);
       }
+      if(bird.body.blocked.down)
+        {
+          bird.body.setVelocityY(-100);
+        }
     }
     
   }
