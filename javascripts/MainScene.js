@@ -150,7 +150,8 @@ create ()
 
   this.fruits = this.physics.add.group({
     allowGravity: false,
-    immovable: true
+    immovable: true,
+    key: 'fruits'
   });
 
   map.getObjectLayer('points').objects.forEach((fruit) => {
@@ -171,6 +172,8 @@ create ()
 
   this.physics.add.collider(this.player, this.spikes, this.playerHit, null, this);
   this.physics.add.collider(this.player, this.check, this.sendToNextLevel, null, this);
+  this.physics.add.collider(this.player, this.check, this.sendToNextLevel, null, this);
+
   this.keyCollider = this.physics.add.collider(this.player, this.key, this.getKey, null, this);
 
 }
