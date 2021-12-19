@@ -18,7 +18,14 @@ export class LevelScene extends Phaser.Scene{
     this.load.tilemapTiledJSON('map_level',`./assets/maps/map${this.player.level}.json`);
     this.load.image('tiles','./assets/maps/terrain.png');
     this.load.image('restart', './assets/Free/Menu/Buttons/Restart.png')
+    this.load.spritesheet('spriteBird','./assets/maps/birdfatidle.png',{frameWidth: 40, frameHeight: 48},8)
     Player.preload(this)
+    
+
+    
+  }
+  playerHit(){
+    this.player.next(false)
   }
 
   create(){
@@ -72,10 +79,57 @@ export class LevelScene extends Phaser.Scene{
       frames: this.anims.generateFrameNumbers('player_sprite', { start: 35, end: 47 }),
       frameRate: 17,
     });
+    this.spikes = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    });
+    this.birds = this.physics.add.group({
+      allowGravity: true,
+      key: 'birds',
+      collidWorldBounds:true
+    });
+
+
+    map.getObjectLayer('spikes').objects.forEach((spike) => {
+      // Add new spikes to our sprite group
+      const spikeSprite = this.spikes.create(spike.x, spike.y- spike.height, 'spike').setOrigin(0);
+      spikeSprite.body.setSize(spike.width-2, spike.height - 10).setOffset(0, 10);
+    });
+    this.physics.add.collider(this.player, this.spikes, this.playerHit, null, this);
+
+    map.getObjectLayer('bird').objects.forEach((bird)=>{
+      var bird=this.add.sprite(bird.x,bird.y,'spriteBird').setOrigin(0)
+      this.anims.create({
+        key: 'idle_bird',
+        frames: this.anims.generateFrameNumbers('spriteBird',{start:0, end:7}),
+        frameRate:20,
+        repeat:-1
+      })
+      bird.setSize(40,48)
+      bird.anims.play('idle_bird',true)
+      this.birds.add(bird);
+
+    })
+    this.physics.add.collider(this.player, this.birds, this.playerHit, null, this);
+    this.physics.add.collider(this.birds,this.map);
+
 
   }
 
   update(){
     this.player.update(this.cursors)
+    for(const bird of this.birds.children.entries)
+    {
+      if(bird.x-20<=this.player.x && bird.x+20>=this.player.x && this.player.y>bird.y)
+      {
+        //bird.setVelocityY(100);
+        console.log("attack");
+        //if(bird.body.blocked.down)
+       // {
+
+        //}
+      }
+    }
+    
   }
 }
