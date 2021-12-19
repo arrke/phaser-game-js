@@ -154,18 +154,20 @@ create ()
     key: 'fruits'
   });
 
-  map.getObjectLayer('points').objects.forEach((fruit) => {
+  map.getObjectLayer('fruitPoints').objects.forEach((fruit) => {
    
-    this.fruit = this.add.sprite(fruit.x, fruit.y- fruit.height, 'spriteFruit').setOrigin(0);
+    var fruit = this.add.sprite(fruit.x, fruit.y- fruit.height, 'spriteFruit').setOrigin(0);
 
     this.anims.create({
-      key: 'idle',
+      key: 'idle_point',
       frames: this.anims.generateFrameNumbers('spriteFruit', { start: 0, end: 16 }),
-      frameRate: 17,
+      frameRate: 30,
       repeat: -1
     });
-    this.fruit.anims.play('idle', true)
-    this.fruits.add(this.fruit)
+    fruit.setSize(10,10)
+
+    fruit.anims.play('idle_point', true)
+    this.fruits.add(fruit)
     
   });
 
