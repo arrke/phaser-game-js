@@ -41,6 +41,12 @@ export class MainScene extends Phaser.Scene{
     }
   }
 
+  getPoints(sprite, fruit){
+    this.fruits.killAndHide(fruit);
+    fruit.body.enable = false;
+    this.player.addPoints(10)
+  }
+
 create ()
 {
     const map = this.make.tilemap({key: 'map', tileWidth: 16, tileHeight: 16})
@@ -52,7 +58,6 @@ create ()
     restartButton.on('pointerup', () => {
       this.scene.start(this)
     })
-
     this.notDestroyed = true;
     this.border = map.createLayer('border', tileset)
     this.terrain = map.createLayer('terrain', tileset)
@@ -93,7 +98,8 @@ create ()
     scene:this,
     x:100,
     y:200,
-    level: 0
+    level: 0,
+    points: 0
   });
 
   this.cursors = this.input.keyboard.createCursorKeys();
@@ -156,15 +162,14 @@ create ()
 
   map.getObjectLayer('fruitPoints').objects.forEach((fruit) => {
    
-    var fruit = this.add.sprite(fruit.x, fruit.y- fruit.height, 'spriteFruit').setOrigin(0);
-
+    var fruit = this.add.sprite(fruit.x, fruit.y- fruit.height, 'spriteFruit').setOrigin(0).setScale(0.8);
+    fruit.setSize(fruit.width, fruit.height, true);
     this.anims.create({
       key: 'idle_point',
       frames: this.anims.generateFrameNumbers('spriteFruit', { start: 0, end: 16 }),
       frameRate: 30,
       repeat: -1
     });
-    fruit.setSize(10,10)
 
     fruit.anims.play('idle_point', true)
     this.fruits.add(fruit)
@@ -174,15 +179,18 @@ create ()
 
   this.physics.add.collider(this.player, this.spikes, this.playerHit, null, this);
   this.physics.add.collider(this.player, this.check, this.sendToNextLevel, null, this);
-  this.physics.add.collider(this.player, this.check, this.sendToNextLevel, null, this);
-
+  this.physics.add.overlap(this.player, this.fruits, this.getPoints, null, this);
+  
   this.keyCollider = this.physics.add.collider(this.player, this.key, this.getKey, null, this);
-
+  
+  this.point_text = this.add.text(20, 0, `Points : ${this.player.points}`)
+  this.point_text.setDepth(99)
 }
 
   update ()
   {
     this.player.update(this.cursors)
+    this.point_text.setText(`Points : ${this.player.points}`)
   }
 
   

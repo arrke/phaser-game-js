@@ -5,7 +5,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite{
       scene,
       x,
       y,
-      level
+      level,
+      points
     } = data
     super(scene, x, y, 'player_sprite')
     scene.physics.add.existing(this);
@@ -13,13 +14,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite{
     this.body.setSize(this.body.width-10,this.body.height-2)
     this.setDepth(99);
     this.level = level
+    this.points = points
   }
 
   static preload(scene){
     scene.load.spritesheet('player_sprite', './assets/player.png', { frameWidth: 32, frameHeight: 32 })
     scene.load.spritesheet('player_disapear', './assets/Free/Main Characters/Desappearing (96x96).png', { frameWidth: 96, frameHeight: 96 })
   }
-
+  
   create(){
     this.setVelocity(100, 200);
     this.setBounce(0.2);
@@ -56,7 +58,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite{
       this.setVelocityX(0);
     }
   }
-
+  addPoints(value){
+    this.points = this.points + value
+  }
   next(hitted,scene){
     this.visible = false
     this.disappearing = this.scene.add.sprite(this.body.x, this.body.y, 'player_disapear');
