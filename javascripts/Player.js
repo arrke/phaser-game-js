@@ -1,10 +1,18 @@
 
 export class Player extends Phaser.Physics.Arcade.Sprite{
-  constructor(scene){
-    super(scene, 100, 200, 'player_sprite')
+  constructor(data){
+    let{
+      scene,
+      x,
+      y,
+      level
+    } = data
+    super(scene, x, y, 'player_sprite')
     scene.physics.add.existing(this);
     this.scene.add.existing(this, true) 
     this.body.setSize(this.body.width-10,this.body.height-2)
+    this.setDepth(99);
+    this.level = level
   }
 
   static preload(scene){
@@ -49,15 +57,26 @@ export class Player extends Phaser.Physics.Arcade.Sprite{
     }
   }
 
-  next(){
+  next(hitted,scene){
     this.visible = false
     this.disappearing = this.scene.add.sprite(this.body.x, this.body.y, 'player_disapear');
+    this.disappearing.anotherScene = scene
+    this.disappearing.player = this
     this.disappearing.play("desappearingPlayer")  
     this.disappearing.on('animationcomplete', function(){
-      console.log(this.visible = false)
+      this.visible = false
     });
-    this.x = 100
-    this.y = 200
+
+    this.disappearing.on('animationcomplete', function(){
+      if(this.anotherScene){
+        this.anotherScene.start("level", this.player.level + 1)
+      }
+    });
+
+    if(!hitted){
+      this.x = -500
+      this.y = -1 
+    }
   }
 
 }

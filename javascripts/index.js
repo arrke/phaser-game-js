@@ -1,4 +1,6 @@
 import { MainScene } from './MainScene.js';
+import { LevelScene } from './LevelScene.js';
+
 var config = {
   type: Phaser.AUTO,
   width: 512,
@@ -10,7 +12,7 @@ var config = {
           debug: true
       }
   },
-  scene: [MainScene]
+  scene: [MainScene, LevelScene]
 };
 
 new Phaser.Game(config);
