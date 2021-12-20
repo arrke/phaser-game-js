@@ -2,7 +2,7 @@ import { Player } from "./Player.js";
 
 export class Level3Scene extends Phaser.Scene {
     constructor() {
-        super("level4")
+        super("level3")
     }
     init(data) {
         let {
@@ -182,8 +182,8 @@ export class Level3Scene extends Phaser.Scene {
         this.point_text.setText(`Points : ${this.player.points}`)
         for (const bird of this.birds.children.entries) {
             if (bird.x - 20 <= this.player.x && bird.x + 20 >= this.player.x && this.player.y > bird.y) {
-                bird.body.setVelocityY(200);
-            }
+                bird.body.setVelocityY(350);
+            }   
             if (bird.body.blocked.down) {
                 bird.body.setVelocityY(-100);
             }

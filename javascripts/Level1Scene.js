@@ -2,7 +2,7 @@ import { Player } from "./Player.js";
 
 export class Level1Scene extends Phaser.Scene{
   constructor(){
-    super("level0")
+    super("level1")
   }
   init(data){
     let{
@@ -21,7 +21,7 @@ export class Level1Scene extends Phaser.Scene{
   }
 
   preload(){
-    this.load.tilemapTiledJSON('map_level',`./assets/maps/map0.json`);
+    this.load.tilemapTiledJSON('map_level',`./assets/maps/map1.json`);
     this.load.image('spike','./assets/Free/Traps/Spikes/Idle.png');
     this.load.image('tiles','./assets/maps/terrain.png');
     this.load.image('restart', './assets/Free/Menu/Buttons/Restart.png')

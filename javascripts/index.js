@@ -11,7 +11,7 @@ var config = {
       default: 'arcade',
       arcade: {
           gravity: { y: 900 },
-          debug: true
+          debug: false
       }
   },
   scene: [
