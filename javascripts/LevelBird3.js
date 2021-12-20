@@ -2,7 +2,7 @@ import { Player } from "./Player.js";
 
 export class Level3Scene extends Phaser.Scene {
     constructor() {
-        super("level3")
+        super("level2")
     }
     init(data) {
         let {
@@ -56,7 +56,7 @@ export class Level3Scene extends Phaser.Scene {
         const tileset = map.addTilesetImage('Terrain (16x16)', 'tiles')
         this.map = map.createLayer('map', tileset)
         this.map.setCollisionByExclusion(-1, true);
-        const restartButton = this.add.image(460, 40, 'restart').setInteractive()
+        const restartButton = this.add.image(460, 40, 'restart').setInteractive().setScrollFactor(0);
         restartButton.setScale(1.5)
         restartButton.setDepth(99)
         restartButton.on('pointerup', () => {

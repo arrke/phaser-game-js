@@ -3,7 +3,7 @@ import { Player } from "./Player.js";
 
 export class Level2Scene extends Phaser.Scene{
   constructor(){
-    super("level2")
+    super("level1")
   }
   init(data){
     let{
@@ -142,7 +142,7 @@ export class Level2Scene extends Phaser.Scene{
     this.thirdWall = map.createLayer('thirdWall', tileset)
     this.fourthWall = map.createLayer('fourthWall', tileset)
 
-    const restartButton = this.add.image(460,40,'restart').setInteractive()
+    const restartButton = this.add.image(460,40,'restart').setInteractive().setScrollFactor(0);
     restartButton.setScale(1.5)
     restartButton.setDepth(99)
     restartButton.on('pointerup', () => {

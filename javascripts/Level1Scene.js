@@ -2,7 +2,7 @@ import { Player } from "./Player.js";
 
 export class Level1Scene extends Phaser.Scene{
   constructor(){
-    super("level1")
+    super("level0")
   }
   init(data){
     let{
