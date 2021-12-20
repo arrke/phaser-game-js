@@ -1,5 +1,4 @@
 import { MainScene } from './MainScene.js';
-import { Level1Scene } from './Level1Scene.js';
 import { Level2Scene } from './LevelWithEnemies.js';
 import { Level3Scene } from './LevelBird3.js';
 
@@ -16,7 +15,6 @@ var config = {
   },
   scene: [
     MainScene, 
-    Level1Scene,
     Level2Scene,
     Level3Scene
   ]
