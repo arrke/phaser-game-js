@@ -2,7 +2,7 @@ import { Player } from "./Player.js";
 
 export class Level1Scene extends Phaser.Scene{
   constructor(){
-    super("level1")
+    super("level0")
   }
   init(data){
     let{
@@ -21,7 +21,7 @@ export class Level1Scene extends Phaser.Scene{
   }
 
   preload(){
-    this.load.tilemapTiledJSON('map_level',`./assets/maps/map${this.player.level}.json`);
+    this.load.tilemapTiledJSON('map_level',`./assets/maps/map0.json`);
     this.load.image('spike','./assets/Free/Traps/Spikes/Idle.png');
     this.load.image('tiles','./assets/maps/terrain.png');
     this.load.image('restart', './assets/Free/Menu/Buttons/Restart.png')
@@ -43,8 +43,6 @@ export class Level1Scene extends Phaser.Scene{
   create(){
     const map = this.make.tilemap({key: 'map_level', tileWidth: 16, tileHeight: 16})
     const tileset = map.addTilesetImage('Terrain (16x16)', 'tiles')
-    this.background = map.createLayer('background', tileset)
-    this.background.setCollisionByExclusion(-1, true);
     this.map = map.createLayer('map', tileset)
     this.map.setCollisionByExclusion(-1, true);
 
